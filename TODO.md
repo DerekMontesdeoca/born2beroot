@@ -21,11 +21,39 @@
 [ ] command aa-status
 [ ] command ufw
 [ ] TTY
+[ ] command nmap - Useful and almost essential for networking and security
 
 ## Server Checklist
 
-[ ] Create Debian Stable Virtual Machine on VirtualBox 
-[ ] Create 2 encrypted partitions with LVM. For the bonus, create the following partition table:
+[ ] Installed GRUB? (grub-install /dev/sda)
+[ ] Installed Kernel? (apt install linux-image-amd64)
+[ ] Configured /etc/fstab?
+[ ] Configured Network? (/etc/network/interfaces)
+[ ] Set Locale & Timezone? (locale-gen, dpkg-reconfigure tzdata)
+[ ] Created a User? (adduser myuser)
+[ ] Generated initramfs? (update-initramfs -u)
+[ ] Updated sources.list?
+[ ] Enabled essential services? (systemctl enable cron ssh)
+
+[ ] Load a live iso into the virtual machine.
+[ ] Load and execute script.
+[ ] Install parted, cryptsetup, lvm2.
+[ ] Create a partition to make LVM on LUKS.
+[ ] Add a password to new LUKS partition.
+[ ] Open LUKS partition.
+[ ] Create logical volumes with LVM.
+[ ] Create a dir for the new debian.
+[ ] Mount lvs on debian dir.
+[ ] Mount with --rbind sys, dev, run.
+[ ] Mount proc with -t proc.
+[ ] chroot into new debian.
+[ ] Update apt keys adding them to gpg with gpg --keyserver --recv-keys.
+[ ] Update apt sources list.
+[ ] do apt update
+[ ] 
+
+
+[ ] Create encrypted partitions with LVM. For the bonus, create the following partition table:
 - storage unit with 30.8G 
     - 500M -> /boot
     - 1k
@@ -39,11 +67,20 @@
             - tmp -> /tmp
             - var--log -> /var/log
 - rom with 1024M
+[ ] Mount 
 
+[ ] Set hostname to {login}42.
+[ ] Set up root passwd and admin user.
+[ ] Set up the following users:
+- root
+- {user}
+
+[ ] Make sure that {user} user belongs to the groups user42 and sudo.
+[ ] Install ssh server.
+[ ] Configure ssh server. 
 [ ] Execute SSH on port 4242.
 [ ] Make sure SSH is unavailable for root.
 [ ] Configure firewall to only allow inc 4242.
-[ ] Set hostname to {login}42.
 [ ] Learn how to change the hostname for the defense.
 [ ] Set password policy:
 - 30 day expiration period.
@@ -72,11 +109,6 @@
     - /bin
     - /snap/bin
 
-[ ] Set up the following users:
-- root
-- {user}
-
-[ ] Make sure that {user} user belongs to the groups user42 and sudo.
 [ ] Learn how to create a user and assign it to a group for the defense.
 [ ] After setting up configuration files, change all passwords on the VM, including root.
 [ ] Create a monitoring script called monitoring.sh:
