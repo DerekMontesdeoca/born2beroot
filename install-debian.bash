@@ -48,17 +48,19 @@ fi
 if [[ -z $(pvs) ]]; then
     pvcreate "$cryptmapping"
 fi
+
+vg=LVMGroup
 if [[ -z $(vgs) ]]; then
-    vgcreate LVMGroup "$cryptmapping"
+    vgcreate "$vg" "$cryptmapping"
 fi
 if [[ -z $(lvs) ]]; then
-    lvcreate --size 10G --name root
-    lvcreate --size 5G --name home
-    lvcreate --size 3G --name var
-    lvcreate --size 3G --name srv
-    lvcreate --size 3G --name tmp
-    lvcreate --size 4G --name var-log
-    lvcreate --extents 100%FREE --name swap
+    lvcreate --size 10G --name root "$vg"
+    lvcreate --size 5G --name home "$vg"
+    lvcreate --size 3G --name var "$vg"
+    lvcreate --size 3G --name srv "$vg"
+    lvcreate --size 3G --name tmp "$vg"
+    lvcreate --size 4G --name var-log "$vg"
+    lvcreate --extents 100%FREE --name swap "$vg"
 fi
 
 # installation_root=debian
