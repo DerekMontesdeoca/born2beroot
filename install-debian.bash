@@ -13,16 +13,16 @@ apt update && apt upgrade -y
 apt install debootstrap parted lvm2 cryptsetup systemd-timesyncd -y
 
 # Sync Time.
-if ! systemctl status systemd-timesyncd; then
+if ! systemctl status systemd-timesyncd --no-pager; then
     systemctl restart systemd-timesyncd
-    systemctl status systemd-timesyncd
+    systemctl status systemd-timesyncd --no-pager
 fi
 
 # Make Partitions.
 if ! lsblk | grep -q sda1 \
     || ! lsblk | grep -q sda2 \
     || ! lsblk | grep -q sda5 \
-    || ! parted -s /dev/sda | grep -q msdos;
+    || ! parted -s /dev/sda p | grep -q msdos;
 then
     parted -s /dev/sda mklabel msdos
     parted -s /dev/sda mkpart primary 1MiB 501MiB
@@ -34,17 +34,22 @@ then
 fi
 
 # Create Encrypted Partition.
+cryptmapping_name="sda5_crypt"
+cryptmapping="/dev/mapper/$cryptpart"
+cryptpart="/dev/sda5"
 if ! cryptsetup isLuks /dev/sda5; then
-    cryptsetup luksFormat /dev/sda5
-    cryptsetup open --type luks /dev/sda5 sda5_crypt
+    cryptsetup --batch-mode luksFormat "$cryptpart"
+fi
+if [[ ! -e "/dev/mapper/sda5_crypt" ]]; then
+    cryptsetup open --type luks "$cryptpart" "$cryptmapping_name"
 fi
 
 # Create LVM.
 if [[ -z $(pvs) ]]; then
-    pvcreate /dev/mapper/sda5_crypt
+    pvcreate "$cryptmapping"
 fi
-if [[ -z $(vgs) ]]
-    vgcreate LVMGroup /dev/mapper/sda5_crypt
+if [[ -z $(vgs) ]]; then
+    vgcreate LVMGroup "$cryptmapping"
 fi
 if [[ -z $(lvs) ]]; then
     lvcreate --size 10G --name root
