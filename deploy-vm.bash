@@ -78,7 +78,7 @@ disk=disk1.vdi
 if [[ ! -f $disk ]]; then
     VBoxManage createmedium disk \
         --filename="$disk" \
-        --size=30800 \
+        --size=31540 \
         --format=VDI
 fi
 
