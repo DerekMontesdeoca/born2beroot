@@ -22,7 +22,10 @@ VBoxManage modifyvm "$name" \
     --memory=2048 \
     --cpus=2 \
     --nic1=bridged \
-    --bridge-adapter1="$(ip route | grep default | awk '{printf $5}')"
+    --bridge-adapter1="$(ip route | grep default | awk '{printf $5}')" \
+    --graphicscontroller=vboxsvga \
+    --vram=20
+
 
 # ============ Create ide controller for boot ============ #
 
