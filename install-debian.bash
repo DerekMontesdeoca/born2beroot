@@ -35,7 +35,7 @@ fi
 
 # Create Encrypted Partition.
 cryptmapping_name="sda5_crypt"
-cryptmapping="/dev/mapper/$cryptpart"
+cryptmapping="/dev/mapper/$cryptmapping_name"
 cryptpart="/dev/sda5"
 if ! cryptsetup isLuks /dev/sda5; then
     cryptsetup --batch-mode luksFormat "$cryptpart"
