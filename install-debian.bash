@@ -3,6 +3,8 @@
 set -euo pipefail
 IFS=$'\n\t'
 
+D_HOSTNAME=dmontesd42
+
 setterm -repeat off # Avoid character repetition.
 
 if [[ "$EUID" -ne 0 ]]; then
@@ -127,7 +129,7 @@ system_dirs=(
     "/run"
 )
 for dir in "${system_dirs[@]}"; do
-    if ! findmnt "$dir"; then
+    if ! findmnt "$installation_root/$dir"; then
         mount -o X-mount.mkdir --rbind "$dir" "$installation_root/$dir"
     fi
 done
@@ -158,7 +160,14 @@ EOF
 fi
 
 # Copy apt keys to new system.
-rsync -azv "/usr/share/keyrings/" "$installation_root/etc/trusted.gpg.d/"
+rsync -azv "/usr/share/keyrings/" "$installation_root/etc/apt/trusted.gpg.d/"
 
 # chroot into new system.
-chroot $installation_root
+chroot $installation_root "/usr/bin/bash" "configure-chroot.bash"
+
+# Manually umount the system.
+umount -R $installation_root
+
+if [[ -n $(swapon --show) ]]; then
+    swapoff "/dev/mapper/$vg-swap"
+fi
