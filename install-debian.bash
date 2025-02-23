@@ -164,7 +164,10 @@ fi
 rsync -azv "/usr/share/keyrings/" "$installation_root/etc/apt/trusted.gpg.d/"
 
 # chroot into new system.
+cp "configure-chroot.bash" "$installation_root/configure-chroot.bash"
+trap "rm -f $installation_root/configure-chroot.bash" EXIT
 chroot $installation_root "/usr/bin/bash" "configure-chroot.bash"
+
 
 # Manually umount the system.
 umount -R -l $installation_root
