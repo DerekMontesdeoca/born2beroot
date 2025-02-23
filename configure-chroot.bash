@@ -36,14 +36,14 @@ EOF
 fi
 
 # DHCP default interface
+interface_name=$(
+    ip -o link show \
+    | grep -v lo \
+    | head -n1 \
+    | awk '{print $2}' \
+    | grep -Po '.+[^:]'
+)
 if [[ ! -f "/etc/network/interfaces.d/$interface_name" ]]; then
-    interface_name=$(
-        ip -o link show \
-        | grep -v lo \
-        | head -n1 \
-        | awk '{print $2}' \
-        | grep -Po '.+[^:]'
-    )
     cat > "/etc/network/interfaces.d/$interface_name" << EOF
 auto $interface_name
 iface $interface_name inet dhcp
