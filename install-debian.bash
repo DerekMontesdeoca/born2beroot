@@ -122,23 +122,26 @@ if ! swapon -s "/dev/mapper/$vg-swap"; then
     swapon "/dev/mapper/$vg-swap"
 fi
 
-# Bind mount system dirs.
-system_dirs=(
-    "/proc"
-    "/dev"
-    "/sys"
-    "/run"
-)
-for dir in "${system_dirs[@]}"; do
-    if ! findmnt "$installation_root/$dir"; then
-        mount -o X-mount.mkdir --rbind "$dir" "$installation_root/$dir"
-    fi
-done
-
 # Install minimal debian.
 if [[ ! -d "$installation_root/usr/bin" ]]; then
     debootstrap --arch=amd64 stable "$installation_root"
 fi
+
+# Bind mount system dirs.
+system_dirs=(
+    "/dev"
+    "/sys"
+    "/run"
+)
+if ! findmnt "$installation_root/proc"; then
+    mount -t proc "/proc" "$installation_root/proc"
+fi
+for dir in "${system_dirs[@]}"; do
+    if ! findmnt "$installation_root/$dir"; then
+        mount -o X-mount.mkdir --rbind --make-rslave \
+            "$dir" "$installation_root/$dir"
+    fi
+done
 
 # Generate fstab.
 cat > "$installation_root/etc/fstab" << EOF
@@ -170,12 +173,10 @@ chroot $installation_root "/usr/bin/bash" "configure-chroot.bash"
 
 
 # Manually umount the system.
-umount -R -l $installation_root
-
 if [[ -n $(swapon --show) ]]; then
     swapoff "/dev/mapper/$vg-swap"
 fi
-
+umount -R $installation_root
 cryptsetup close "$cryptpart"
 
 reboot
