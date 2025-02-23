@@ -92,7 +92,7 @@ fi
 # Mount filesystems.
 installation_root=/mnt
 mkdir -p "$installation_root"
-umount -R "$installation_root"
+umount -R -l "$installation_root" || true
 fss=(
     "/dev/mapper/$vg-root"
     "/dev/sda1"
@@ -167,7 +167,7 @@ rsync -azv "/usr/share/keyrings/" "$installation_root/etc/apt/trusted.gpg.d/"
 chroot $installation_root "/usr/bin/bash" "configure-chroot.bash"
 
 # Manually umount the system.
-umount -R $installation_root
+umount -R -l $installation_root
 
 if [[ -n $(swapon --show) ]]; then
     swapoff "/dev/mapper/$vg-swap"
