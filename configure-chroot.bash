@@ -5,6 +5,10 @@ IFS=$'\n\t'
 
 D_HOSTNAME=dmontesd42
 
+# Update and upgrade the system.
+apt update
+apt upgrade -y
+
 # Set up locale.
 apt install --no-install-recommends locales -y
 if [[ ! -f "/etc/locale.gen" || $(grep '^[^#]') -ne 0 ]]; then
