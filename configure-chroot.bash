@@ -11,7 +11,7 @@ apt upgrade -y
 
 # Set up locale.
 apt install --no-install-recommends locales -y
-if [[ ! -f "/etc/locale.gen" || $(grep '^[^#]') -ne 0 ]]; then
+if [[ ! -f "/etc/locale.gen" || $(grep '^[^#]' "/etc/locale.gen") -ne 0 ]]; then
     dpkg-reconfigure locales
     sed -i '/en_US.UTF-8/ s/# //' /etc/locale.gen
     locale-gen
