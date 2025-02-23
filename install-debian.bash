@@ -81,17 +81,18 @@ ext4_lvs=(
     "var--log"
 )
 for lv in "${ext4_lvs[@]}"; do
-    if ! file -sL | grep -q ext4; then
+    if ! file -sL "/dev/mapper/$vg-$lv" | grep -q ext4; then
         mkfs.ext4 "/dev/mapper/$vg-$lv"
     fi
 done
-if ! file -sL | grep -q 'Linux swap file'; then
+if ! file -sL "/dev/mapper/$vg-swap" | grep -q 'Linux swap file'; then
     mkswap "/dev/mapper/$vg-swap"
 fi
 
 # Mount filesystems.
 installation_root=/mnt
 mkdir -p "$installation_root"
+umount -R "$installation_root"
 fss=(
     "/dev/mapper/$vg-root"
     "/dev/sda1"
@@ -171,3 +172,7 @@ umount -R $installation_root
 if [[ -n $(swapon --show) ]]; then
     swapoff "/dev/mapper/$vg-swap"
 fi
+
+cryptsetup close "$cryptpart"
+
+reboot
