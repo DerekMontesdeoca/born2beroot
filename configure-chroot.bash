@@ -52,9 +52,10 @@ fi
 # ============ #
 
 # Install the kernel.
-apt install --no-install-recommends -y linux-image-amd64
+apt install --no-install-recommends -y linux-image-amd64 cryptsetup
+update-initramfs -u -k all
 
 # Install boot loader.
 apt install --no-install-recommends -y grub-pc
-grub-install /dev/sda1
+grub-install /dev/sda
 update-grub
