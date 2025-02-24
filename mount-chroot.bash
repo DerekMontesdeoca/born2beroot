@@ -8,6 +8,12 @@ cryptmapping_name="sda5_crypt"
 if [[ ! -e "/dev/mapper/sda5_crypt" ]]; then
     cryptsetup open --type luks "$cryptpart" "$cryptmapping_name"
 fi
+if ! timeout 5 bash -c "while [[ ! -e \"$cryptmapping\" ]]; do sleep 0.2; done"
+then
+    echo "Timed out waiting for $cryptmapping" >&2
+    exit 1
+fi
+
 
 installation_root=/mnt
 mkdir -p "$installation_root"
