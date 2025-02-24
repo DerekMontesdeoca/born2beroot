@@ -52,7 +52,8 @@ fi
 # ============ #
 
 # Install the kernel.
-apt install --no-install-recommends -y linux-image-amd64 cryptsetup
+apt install --no-install-recommends -y \
+    linux-image-amd64 cryptsetup cryptsetup-initramfs
 update-initramfs -u -k all
 
 # Install boot loader.

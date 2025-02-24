@@ -48,6 +48,13 @@ if [[ ! -e "/dev/mapper/sda5_crypt" ]]; then
     cryptsetup open --type luks "$cryptpart" "$cryptmapping_name"
 fi
 
+# Wait for the crypt_map to be active.
+if ! timeout bash -c 'while [[ ! -e "$cryptmapping" ]]; do sleep 0.2; done'
+then
+    echo "Timed out waiting for $cryptmapping" >&2
+    exit 1
+fi
+
 # Create LVM.
 if [[ -z $(pvs) ]]; then
     pvcreate "$cryptmapping"
