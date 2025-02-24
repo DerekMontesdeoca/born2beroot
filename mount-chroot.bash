@@ -35,7 +35,7 @@ for i in "${!fss[@]}"; do
     if ! findmnt "${fss[$i]}"; then
         mount -o X-mount.mkdir \
             "${fss[$i]}" \
-            "$installation_root/${mountpoints[$i]}"
+            "$(realpath $installation_root/${mountpoints[$i]})"
     fi
 done
 swap_uuid=$(blkid -s UUID -o value "/dev/mapper/$vg-swap")
@@ -48,15 +48,15 @@ system_dirs=(
     "/run"
 )
 if ! findmnt "$installation_root/proc"; then
-    mount -t proc "/proc" "$installation_root/proc"
+    mount -t proc "/proc" "$(realpath $installation_root/proc)"
 fi
 if ! findmnt "$installation_root/sys"; then
-    mount -t sysfs "/proc" "$installation_root/sys"
+    mount -t sysfs "/proc" "$(realpath $installation_root/sys)"
 fi
 for dir in "${system_dirs[@]}"; do
     if ! findmnt "$installation_root/$dir"; then
         mount -o X-mount.mkdir --rbind --make-rslave \
-            "$dir" "$installation_root/$dir"
+            "$dir" "$(realpath $installation_root/$dir)"
     fi
 done
 
