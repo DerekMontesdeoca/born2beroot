@@ -118,7 +118,8 @@ for i in "${!fss[@]}"; do
             "$installation_root/${mountpoints[$i]}"
     fi
 done
-if ! swapon -s "/dev/mapper/$vg-swap"; then
+swap_uuid=$(blkid -s UUID -o value "/dev/mapper/$vg-swap")
+if ! swapon --show=UUID | grep -q "$swap_uuid" ; then
     swapon "/dev/mapper/$vg-swap"
 fi
 
@@ -157,7 +158,7 @@ EOF
 
 # Generate crypttab.
 if [[ ! -f "$installation_root/etc/crypttab" ]]; then
-    cryptpart_uuid=$(blkid | grep "$cryptpart" | awk '{print $2}' | grep -oP '"\K[^"]+')
+    cryptpart_uuid=$(blkid -s UUID -o value "$cryptpart")
     cat > "$installation_root/etc/crypttab" << EOF
 $cryptmapping_name UUID=$cryptpart_uuid none luks,tries=3
 EOF
@@ -177,6 +178,7 @@ if [[ -n $(swapon --show) ]]; then
     swapoff "/dev/mapper/$vg-swap"
 fi
 umount -R $installation_root
+vgchange -an "$vg" 
 cryptsetup close "$cryptpart"
 
 reboot
