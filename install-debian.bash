@@ -132,17 +132,13 @@ fi
 system_dirs=(
     "/dev"
     "/run"
+    "/sys"
+    "/proc"
 )
-if ! findmnt "$installation_root/proc"; then
-    mount -t proc "/proc" "$(realpath $installation_root/proc)"
-fi
-if ! findmnt "$installation_root/sys"; then
-    mount -t sysfs "/proc" "$(realpath $installation_root/sys)"
-fi
 for dir in "${system_dirs[@]}"; do
-    if ! findmnt "$installation_root/$dir"; then
+    if ! findmnt "$(realpath "$installation_root/$dir")"; then
         mount -o X-mount.mkdir --rbind --make-rslave \
-            "$dir" "$(realpath $installation_root/$dir)"
+            "$dir" "$(realpath "$installation_root/$dir")"
     fi
 done
 
