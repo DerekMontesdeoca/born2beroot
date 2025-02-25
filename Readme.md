@@ -85,8 +85,9 @@
 - [ ] Set up a service that you consider useful. (Docker? boto3?)
 
 
-## Install Debian
+## Steps to Complete the Assginment
 
+### Install Minimal Debian
 1. Configure locale.
 2. Adjust time.
 3. Install lvm2 cryptsetup parted.
@@ -116,8 +117,10 @@
 26. umount partitions.
 27. Reboot.
 
+### Configure the System
+1.
 
-## Learning
+## Learning Topics
 
 ### VirtualBox
 [VBoxManage Manual](https://www.virtualbox.org/manual/ch08.html)<br>
