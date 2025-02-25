@@ -3,6 +3,8 @@
 ## TODO
 
 - [x] Change boot partition to ext4.
+- [ ] Come up with better names for the scripts.
+- [ ] Should I use .bash or .sh? Research it.
 
 
 ## Assignment Requirements
