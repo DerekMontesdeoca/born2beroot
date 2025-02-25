@@ -12,6 +12,9 @@ DEBIAN_VERSION := 12.9
 create:
 	./deploy-vm.bash $(NAME)
 
+remove_iso:
+	./prepare-first-boot.bash
+
 start:
 	VBoxManage startvm $(NAME)
 
@@ -19,6 +22,6 @@ destroy:
 	VBoxManage unregistervm $(NAME) --delete-all
 
 clean:
-	rm -f debian_12_9_0_amd64.iso sha256sum signature debian-iso
+	rm -f debian_live_12_9_0_amd64-standard.iso sha256sum signature
 
 .PHONY: start create destroy clean

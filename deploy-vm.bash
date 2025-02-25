@@ -89,4 +89,3 @@ VBoxManage storageattach "$name" \
     --type=hdd \
     --medium="$disk"
 
-# ============ Modify the vm? ============ #

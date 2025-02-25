@@ -76,8 +76,8 @@ if [[ -z $(lvs) ]]; then
 fi
 
 # Format partitions.
-if ! file -sL /dev/sda1 | grep -q 'FAT (32 bit)'; then
-    mkfs.vfat -F32 /dev/sda1
+if ! file -sL "/dev/sda1" | grep -q 'ext4'; then
+    mkfs.ext4 "/dev/sda1"
 fi
 ext4_lvs=(
     "root"
@@ -150,8 +150,9 @@ for dir in "${system_dirs[@]}"; do
 done
 
 # Generate fstab.
+bootpart_uuid=$(blkid -s UUID -o value "/dev/sda1")
 cat > "$installation_root/etc/fstab" << EOF
-/dev/sda1 /boot vfat defaults,nodev,nosuid,noexec,fmask=0177,dmask=0077 0 2
+UUID=$bootpart_uuid /boot ext4 defaults,nodev,nosuid,noexec,fmask=0177,dmask=0077 0 2
 /dev/mapper/$vg-root / ext4 defaults 0 1
 /dev/mapper/$vg-home /home ext4 defaults 0 1
 /dev/mapper/$vg-srv /srv ext4 defaults 0 1
@@ -183,7 +184,5 @@ if [[ -n $(swapon --show) ]]; then
     swapoff "/dev/mapper/$vg-swap"
 fi
 umount -R $installation_root
-vgchange -an "$vg" 
-cryptsetup close "$cryptpart"
 
 reboot
