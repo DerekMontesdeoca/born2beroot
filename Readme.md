@@ -5,38 +5,6 @@
 - [x] Change boot partition to ext4.
 
 
-## Install Debian
-
-1. Configure locale.
-2. Adjust time.
-3. Install lvm2 cryptsetup parted.
-4. Make partitions.
-5. LuksFormat main partition.
-6. Open main partition.
-7. Make PVs and create VGs and LVs.
-8. Make filesystems.
-9. Create a chroot directory.
-10. Mount new partitions to chroot dir.
-11. Debootstrap into chroot dir.
-12. Copy apt keyrings into chroot dir.
-12. Mount system dirs into chroot dir with make-rslave.
-13. chroot into chroot dir.
-14. apt update and upgrade.
-15. Set up hostname.
-16. Install, uncomment and generate locale.
-17. Generate loopback network interface and default dhcp interface.
-18. Create fstab.
-19. Create crypttab.
-20. Install lvm2, cryptsetup, cryptsetup-initramfs and grub.
-21. Install kernel.
-22. Update initramfs.
-23. Install grub.
-24. Update grub.
-25. Exit chroot.
-26. umount partitions.
-27. Reboot.
-
-
 ## Assignment Requirements
 
 - [x] Create encrypted partitions with LVM. For the bonus, create the following partition table:
@@ -117,10 +85,42 @@
 - [ ] Set up a service that you consider useful. (Docker? boto3?)
 
 
+## Install Debian
+
+1. Configure locale.
+2. Adjust time.
+3. Install lvm2 cryptsetup parted.
+4. Make partitions.
+5. LuksFormat main partition.
+6. Open main partition.
+7. Make PVs and create VGs and LVs.
+8. Make filesystems.
+9. Create a chroot directory.
+10. Mount new partitions to chroot dir.
+11. Debootstrap into chroot dir.
+12. Copy apt keyrings into chroot dir.
+12. Mount system dirs into chroot dir with make-rslave.
+13. chroot into chroot dir.
+14. apt update and upgrade.
+15. Set up hostname.
+16. Install, uncomment and generate locale.
+17. Generate loopback network interface and default dhcp interface.
+18. Create fstab.
+19. Create crypttab.
+20. Install lvm2, cryptsetup, cryptsetup-initramfs and grub.
+21. Install kernel.
+22. Update initramfs.
+23. Install grub.
+24. Update grub.
+25. Exit chroot.
+26. umount partitions.
+27. Reboot.
+
+
 ## Learning
 
 ### VirtualBox
-[VBoxManage Manual](https://www.virtualbox.org/manual/ch08.html)
+[VBoxManage Manual](https://www.virtualbox.org/manual/ch08.html)<br>
 Hypervisor for virtual machines.
 #### Commands
 - createvm - Create a vm with os type and name
@@ -132,7 +132,7 @@ Hypervisor for virtual machines.
 - unregistervm - Unregister and delete vm.
 
 ### udev
-[ArchWiki](https://wiki.archlinux.org/title/Udev)
+[ArchWiki](https://wiki.archlinux.org/title/Udev)<br>
 udev is the Linux device manager responsible for dynamic device detection and management. It runs in user space and interacts with the kernel's device events, processing them asynchronously.
 - Belongs to the systemd family and only works with systemd.
 - Creates device nodes dynamically in /dev.
@@ -186,19 +186,26 @@ ISO's can be modified to include different things. For example, you can modify a
 A possible workaround for mounting is using `xorriso` on "ossirox" mode, which allows for removing and adding files.
 
 ### dm-crypt / cryptsetup / dmsetup / LUKS
-[ArchWiki](https://wiki.archlinux.org/title/Dm-crypt/System_configuration)
-These commands and technologies are all related to disk encryption and mapping.
-- dm-crypt is the linux kernel's device mapper crypto target. Device mapper is infrastructure in the Linux kernel that provide a generic way to create virtual layers of block devices. Writes to this device will be encrypted  and read decrypted. dm-crypt works at the kernel level, translating on the fly.
-- cryptsetup is what you use to interface with dm-crypt as it runs on user-space.
-- dmsetup is the low-level device mapper interface for managing devices in Linux.
-    - List mappings with `dmsetup ls`.
-    - Get detailed info with `dmsetup info luks-234234`.
-    - Remove a mapped device `dmsetup remove luks-123948`.
-- LUKS (Linux Unified Key Setup) is a disk encryption standard in Linux. LUKS includes a standardized metadata header tha allows for:
-    - Multiple key slots
-    - Secure passphrase changes
-    - Hardware compatibility with bootloaders
-    - Key stretching?
+[ArchWiki](https://wiki.archlinux.org/title/Dm-crypt/System_configuration)<br>
+These commands and technologies are all related to disk encryption and mapping.<br>
+<br>
+**dm-crypt** is the linux kernel's device mapper crypto target. Device mapper is infrastructure in the Linux kernel that provide a generic way to create virtual layers of block devices. Writes to this device will be encrypted  and read decrypted. dm-crypt works at the kernel level, translating on the fly.<br>
+<br>
+**cryptsetup** is what you use to interface with dm-crypt as it runs on user-space.<br>
+<br>
+**dmsetup** is the low-level device mapper interface for managing devices in Linux.
+- List mappings with `dmsetup ls`.
+- Get detailed info with `dmsetup info luks-234234`.
+- Remove a mapped device `dmsetup remove luks-123948`.
+<br>
+
+**LUKS (Linux Unified Key Setup)** is a disk encryption standard in Linux. LUKS includes a standardized metadata header tha allows for:
+- Multiple key slots
+- Secure passphrase changes
+- Hardware compatibility with bootloaders
+- Key stretching?
+<br>
+
 The main use for these commands is encrypting disks and partitions. Basic commands for using cryptsetup with LUKS for encrypting a partition are the following:
 ```sh
 # Format a new partition with LUKS. You can provide a passphrase or a key.
@@ -213,8 +220,10 @@ cryptsetup close /dev/mapper/sda5_crypt
 # Ask if a partition has a LUKS header.
 cryptsetup isLuks /dev/sda5
 ```
-** If you want to close a luks partition that has LVM on it, make sure to deactivate the volume groups from the partition to avoid it telling you the partition is busy.
-If you are using LVM you can have LVM on LUKS or LUKS on LVM. They both have their trade-offs and caveats.
+** If you want to close a luks partition that has LVM on it, make sure to deactivate the volume groups from the partition to avoid it telling you the partition is busy.<br>
+If you are using LVM you can have LVM on LUKS or LUKS on LVM. They both have their trade-offs and caveats.<br>
+
+#### Booting with encrypted disks
 The main issue with encrypting the system comes with booting. When you boot, the bootloader won't be able to find the root partition because it is encrypted. In order to decrypt it, the initial ram filesystem (initramfs) needs to load the required programs in order to decrypt the partitions and mount them. In debian this is done automatically when setting up your crypttab, updating your initramfs and updating you bootloader. 
 
 #### crypttab (Crypto Table Mapping)
@@ -241,7 +250,7 @@ backup /dev/sdb1       /home/alice/backup.key
 myvolume	/dev/sdX	none	tpm2-device=auto
 
 ```
-I learned that discard option allows for special trim optimizations for SSD's. But discard only allows the optimizations to be allowed to bypass the encryption, if you actually want the optimizations you need to enable them, e.g. continuous or scheduled TRIM.
+I learned that discard option allows for special trim optimizations for SSD's. But discard only allows the optimizations to be allowed to bypass the encryption, if you actually want the optimizations, you need to enable them, e.g. continuous or scheduled TRIM.
 
 ### LVM
 [ArchWiki](https://wiki.archlinux.org/title/LVM)
