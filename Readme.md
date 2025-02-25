@@ -88,6 +88,7 @@
 ## Steps to Complete the Assginment
 
 ### Install Minimal Debian
+Start by installing a minimal debian using debootsrap from a live ISO.
 1. Configure locale.
 2. Adjust time.
 3. Install lvm2 cryptsetup parted.
@@ -118,6 +119,7 @@
 27. Reboot.
 
 ### Configure the System
+Now, with the system running and updated, install all the programs and set all the configuration to meet the requirements of the assignment.
 1.
 
 ## Learning Topics
