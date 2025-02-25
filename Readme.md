@@ -35,17 +35,17 @@
 - [ ] Configure firewall to only allow inc 4242.
 - [ ] Learn how to change the hostname for the defense.
 - [ ] Set password policy:
-- 30 day expiration period.
-- 2 day minimum for changing password.
-- Notifications for users with password expiration period <= 7 days.
-- Password strength policy:
-    - Minlength: 10 chars
-    - 1 Upper
-    - 1 Lower
-    - 1 Number
-    - No 3 consecutive chars
-    - Username not allowed
-    - Non-root only: At least 7 chars that don't belong to the old password.
+    - 30 day expiration period.
+    - 2 day minimum for changing password.
+    - Notifications for users with password expiration period <= 7 days.
+    - Password strength policy:
+        - Minlength: 10 chars
+        - 1 Upper
+        - 1 Lower
+        - 1 Number
+        - No 3 consecutive chars
+        - Username not allowed
+        - Non-root only: At least 7 chars that don't belong to the old password.
 - [ ] Set up sudo and configure it:
     - 3 Tries max.
     - Display custom message when inputting an incorrect password using sudo.
