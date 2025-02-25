@@ -122,7 +122,7 @@ Start by installing a minimal debian using debootsrap from a live ISO.
 
 ### Configure the System
 Now, with the system running and updated, install all the programs and set all the configuration to meet the requirements of the assignment.
-1.
+1. WIP
 
 ## Learning Topics
 
@@ -190,7 +190,8 @@ ISO's can be modified to include different things. For example, you can modify a
 2. Copy the contents to a writable dir, as ISO images are read-only.
 3. Modify the contents.
 4. Repackage the ISO using `xorriso`. However, specific options required for the command need to be researched further.
-A possible workaround for mounting is using `xorriso` on "ossirox" mode, which allows for removing and adding files.
+A possible workaround for mounting is using `xorriso` on "ossirox" mode, which allows for removing and adding files.<br>
+Be aware that some ISO's contain checksums that need to be updated if you modify the ISO.
 
 ### dm-crypt / cryptsetup / dmsetup / LUKS
 [ArchWiki](https://wiki.archlinux.org/title/Dm-crypt/System_configuration)<br>
