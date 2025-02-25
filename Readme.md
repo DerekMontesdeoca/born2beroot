@@ -1,5 +1,7 @@
 # BORN2BEROOT
 
+Build a server on a virtual machine. I'm using Debian stable. The idea is to try to create scripts that will make the build reproducible and learn some bash along the way.
+
 ## TODO
 
 - [x] Change boot partition to ext4.
