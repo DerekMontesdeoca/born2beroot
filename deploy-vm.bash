@@ -19,7 +19,7 @@ VBoxManage createvm \
     --register
 
 VBoxManage modifyvm "$name" \
-    --memory=4096 \
+    --memory=2048 \
     --cpus=2 \
     --nic1=bridged \
     --bridge-adapter1="$(ip route | grep default | awk '{printf $5}')" \
