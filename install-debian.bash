@@ -152,7 +152,7 @@ done
 # Generate fstab.
 bootpart_uuid=$(blkid -s UUID -o value "/dev/sda1")
 cat > "$installation_root/etc/fstab" << EOF
-UUID=$bootpart_uuid /boot ext4 defaults,nodev,nosuid,noexec,fmask=0177,dmask=0077 0 2
+UUID=$bootpart_uuid /boot ext4 defaults,nodev,nosuid,noexec 0 2
 /dev/mapper/$vg-root / ext4 defaults 0 1
 /dev/mapper/$vg-home /home ext4 defaults 0 1
 /dev/mapper/$vg-srv /srv ext4 defaults 0 1
@@ -177,7 +177,6 @@ rsync -azv "/usr/share/keyrings/" "$installation_root/etc/apt/trusted.gpg.d/"
 cp "configure-chroot.bash" "$installation_root/configure-chroot.bash"
 trap "rm -f $installation_root/configure-chroot.bash" EXIT
 chroot $installation_root "/usr/bin/bash" "configure-chroot.bash"
-
 
 # Manually umount the system.
 if [[ -n $(swapon --show) ]]; then
