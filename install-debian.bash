@@ -3,7 +3,9 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-D_HOSTNAME=dmontesd42
+set -a
+source "$(dirname "$0")"/.env
+set +a
 
 setterm -repeat off # Avoid character repetition.
 
@@ -42,10 +44,11 @@ cryptmapping_name="sda5_crypt"
 cryptmapping="/dev/mapper/$cryptmapping_name"
 cryptpart="/dev/sda5"
 if ! cryptsetup isLuks /dev/sda5; then
-    cryptsetup --batch-mode luksFormat "$cryptpart"
+    echo "$ENV_LUKS_PASSWORD" | cryptsetup --batch-mode luksFormat "$cryptpart"
 fi
 if [[ ! -e "/dev/mapper/sda5_crypt" ]]; then
-    cryptsetup open --type luks "$cryptpart" "$cryptmapping_name"
+    echo "$ENV_LUKS_PASSWORD" \
+        | cryptsetup open --type luks "$cryptpart" "$cryptmapping_name"
 fi
 
 # Wait for the crypt_map to be active.
@@ -174,9 +177,11 @@ fi
 rsync -azv "/usr/share/keyrings/" "$installation_root/etc/apt/trusted.gpg.d/"
 
 # chroot into new system.
-cp "configure-chroot.bash" "$installation_root/configure-chroot.bash"
-trap "rm -f $installation_root/configure-chroot.bash" EXIT
-chroot $installation_root "/usr/bin/bash" "configure-chroot.bash"
+cp -r "$(dirname "$0")" "$installation_root/root/born2beroot"
+chroot $installation_root "/usr/bin/bash" "/root/born2beroot/configure-chroot.bash"
+
+# Add server configuration script to profile.
+echo "/root/born2beroot/configure-server.bash" >> "/root/.profile"
 
 # Manually umount the system.
 if [[ -n $(swapon --show) ]]; then

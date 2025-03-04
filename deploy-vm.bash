@@ -88,4 +88,3 @@ VBoxManage storageattach "$name" \
     --device=0\
     --type=hdd \
     --medium="$disk"
-

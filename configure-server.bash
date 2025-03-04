@@ -3,8 +3,6 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-$username=dmontesd42
-
 # Firewall
 apt-get install ufw -y
 ufw reset --force
@@ -71,5 +69,9 @@ sed -i "/^PASS_WARN_AGE/s/.*/PASS_WARN_AGE\t7" "/etc/login.defs"
 
 # Add non-root user
 adduser dmontesd42
-chpasswd dmontesd42:${password}
+chpasswd "dmontesd42:${ENV_USER_PASSWORD}"
 
+# Remove script from .profile
+sed -i '/\/root\/born2beroot\/configure-server.bash/d' "/root/born2beroot/.profile"
+apt-get install --yes shred
+shred -u "/root/born2beroot/.env"

@@ -2,8 +2,6 @@
 
 set -euo pipefail
 IFS=$'\n\t'
-
-D_HOSTNAME=dmontesd42
  
 # Add necessary apt repos.
 cat << EOF > /etc/apt/sources.list
@@ -13,11 +11,11 @@ deb http://deb.debian.org/debian stable-updates main contrib non-free non-free-s
 EOF
 
 # Update and upgrade the system.
-apt update
-apt upgrade -y
+apt-get update
+apt-get upgrade -y
 
 # Set up locale.
-apt install --no-install-recommends locales -y
+apt-get install --no-install-recommends locales -y
 if [[ ! -f "/etc/locale.gen" ]] || ! grep '^[^#]' "/etc/locale.gen"; then
     sed -i '/en_US.UTF-8/ s/# //' /etc/locale.gen
     locale-gen
@@ -26,12 +24,12 @@ fi
 
 # Set root password.
 if [[ $(passwd --status root | awk '{print $2}') != 'P' ]]; then
-    passwd
+    echo "root:$ENV_ROOT_PASSWORD" | chpasswd
 fi
 
 # ============ Network Configuration ============ #
 
-echo -e "$D_HOSTNAME" > /etc/hostname
+echo -e "$ENV_HOSTNAME" > /etc/hostname
 
 # lo interface
 if [[ ! -f "/etc/network/interfaces.d/lo" ]]; then
@@ -59,11 +57,11 @@ fi
 # ============ #
 
 # Install the kernel.
-apt install --no-install-recommends -y \
+apt-get install --no-install-recommends -y \
     linux-image-amd64 cryptsetup cryptsetup-initramfs lvm2
 update-initramfs -u -k all
 
 # Install boot loader.
-apt install --no-install-recommends -y grub-pc
+apt-get install --no-install-recommends -y grub-pc
 grub-install /dev/sda
 update-grub
