@@ -3,19 +3,24 @@
 set -euo pipefail
 IFS=$'\n\t'
 
+set -a
+source "$(dirname "$0")/.env"
+set +a
+
 # Firewall
 apt-get install ufw -y
-ufw reset --force
+ufw --force reset
 ufw logging on
 ufw logging full
 ufw default allow outgoing
 ufw default deny incoming
-ufw default disable routed
-ufw allow in proto tcp from any to any port 4242
+ufw default deny routed
+ufw allow in proto tcp from any to any port "$ENV_SSH_PORT"
 ufw enable
 ufw status verbose | grep -q 'Status: active'
 
 # Check AppArmor
+apt-get install --yes apparmor
 aa-status | grep -q 'apparmor module is loaded'
 
 # systemd-timesync
@@ -75,3 +80,4 @@ chpasswd "dmontesd42:${ENV_USER_PASSWORD}"
 sed -i '/\/root\/born2beroot\/configure-server.bash/d' "/root/born2beroot/.profile"
 apt-get install --yes shred
 shred -u "/root/born2beroot/.env"
+rm -rf "/root/born2beroot"
