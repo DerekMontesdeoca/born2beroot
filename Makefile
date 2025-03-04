@@ -22,6 +22,6 @@ destroy:
 	VBoxManage unregistervm $(NAME) --delete-all
 
 clean:
-	rm -f debian_live_12_9_0_amd64-standard.iso sha256sum signature
+	rm -f debian-live-12.9.0-amd64-standard.iso sha256sum signature
 
 .PHONY: start create destroy clean
