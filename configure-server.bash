@@ -42,7 +42,7 @@ PermitEmptyPasswords no
 MaxSessions 3
 MaxAuthTries 3
 PasswordAuthentication yes
-PublicKeyAuthentication yes
+PubKeyAuthentication yes
 ClientAliveInterval 60
 ClientAliveCountMax 3
 UsePAM yes
