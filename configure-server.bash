@@ -86,7 +86,7 @@ if ! id dmontesd; then
 fi
 
 # Remove script from .profile
-sed -i '/\/root\/born2beroot\/configure-server.bash/d' "/root/born2beroot/.profile"
+sed -i '/\/root\/born2beroot\/configure-server.bash/d' "/root/.profile"
 apt-get install --yes shred
 shred -u "/root/born2beroot/.env"
 rm -rf "/root/born2beroot"
