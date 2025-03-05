@@ -157,12 +157,12 @@ bootpart_uuid=$(blkid -s UUID -o value "/dev/sda1")
 cat > "$installation_root/etc/fstab" << EOF
 UUID=$bootpart_uuid /boot ext4 defaults,nodev,nosuid,noexec 0 2
 /dev/mapper/$vg-root / ext4 defaults 0 1
-/dev/mapper/$vg-home /home ext4 defaults 0 1
-/dev/mapper/$vg-srv /srv ext4 defaults 0 1
-/dev/mapper/$vg-tmp /tmp ext4 defaults 0 1
-/dev/mapper/$vg-var /var ext4 defaults 0 1
-/dev/mapper/$vg-var--log /var/log ext4 defaults 0 1
-/dev/mapper/$vg-swap none swap defaults 0 1
+/dev/mapper/$vg-home /home ext4 defaults 0 2
+/dev/mapper/$vg-srv /srv ext4 defaults 0 2
+/dev/mapper/$vg-tmp /tmp ext4 defaults 0 2
+/dev/mapper/$vg-var /var ext4 defaults 0 2
+/dev/mapper/$vg-var--log /var/log ext4 defaults 0 2
+/dev/mapper/$vg-swap none swap defaults 0 0
 EOF
 
 # Generate crypttab.

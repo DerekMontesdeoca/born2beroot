@@ -7,7 +7,7 @@ Build a server on a virtual machine. I'm using Debian stable. The idea is to try
 - [x] Change boot partition to ext4.
 - [ ] Come up with better names for the scripts.
 - [x] Should I use .bash or .sh? Research it. Sticking to .bash.
-- [ ] Make sure to install apt repos for security.
+- [x] Make sure to install apt repos for security.
 
 
 ## Assignment Requirements
