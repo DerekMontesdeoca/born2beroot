@@ -75,13 +75,15 @@ enforce_for_root
 EOF
 
 # Password expiry.
-sed -i "/^PASS_MAX_DAYS/s/.*/PASS_MAX_DAYS\t30" "/etc/login.defs"
-sed -i "/^PASS_MIN_DAYS/s/.*/PASS_MIN_DAYS\t2" "/etc/login.defs"
-sed -i "/^PASS_WARN_AGE/s/.*/PASS_WARN_AGE\t7" "/etc/login.defs"
+sed -i "/^PASS_MAX_DAYS/s/.*/PASS_MAX_DAYS\t30/" "/etc/login.defs"
+sed -i "/^PASS_MIN_DAYS/s/.*/PASS_MIN_DAYS\t2/" "/etc/login.defs"
+sed -i "/^PASS_WARN_AGE/s/.*/PASS_WARN_AGE\t7/" "/etc/login.defs"
 
 # Add non-root user
-adduser dmontesd42
-echo "dmontesd42:${ENV_USER_PASSWORD}" | chpasswd
+if ! id dmontesd; then
+    adduser dmontesd --disabled-password
+    echo "dmontesd:${ENV_USER_PASSWORD}" | chpasswd
+fi
 
 # Remove script from .profile
 sed -i '/\/root\/born2beroot\/configure-server.bash/d' "/root/born2beroot/.profile"

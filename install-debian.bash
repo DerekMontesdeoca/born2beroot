@@ -181,7 +181,7 @@ cp -r "$(dirname "$0")" "$installation_root/root/born2beroot"
 chroot $installation_root "/usr/bin/bash" "/root/born2beroot/configure-chroot.bash"
 
 # Add server configuration script to profile.
-echo "/root/born2beroot/configure-server.bash" >> "/root/.profile"
+echo "/root/born2beroot/configure-server.bash" >> "$installation_root/root/.profile"
 
 # Manually umount the system.
 if [[ -n $(swapon --show) ]]; then
