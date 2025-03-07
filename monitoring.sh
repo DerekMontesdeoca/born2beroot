@@ -2,6 +2,25 @@
 
 set -euo pipefail
 
+cpu_load=$(awk '
+BEGIN {
+    prev_total = 0
+    prev_idle = 0
+    for (i = 0; i < 2; i++) {
+        if (i != 0) {
+            system("sleep 1")
+            prev_total = total
+            prev_idle = idle
+        }
+        getline < "/proc/stat"
+        close("/proc/stat")
+        total = 0
+        for (j = 2; j <= NF; j++)
+            total += $j
+        idle = $5
+    }
+    printf "%.1f %%\n", (1 - (idle - prev_idle) / (total - prev_total)) * 100
+}')
 default_interface=$(ip route | grep default | awk '{print $5}')
 ip_addr=$(ip -br addr show "$default_interface" \
     | awk '{split($3, ip, "/"); print ip[1]}')
@@ -13,19 +32,13 @@ mem_usage=$(free --mebi \
 disk_usage=$(df --total --human-readable \
     | tail -n1 \
     | awk '{printf "%s/%s (%s)", $3, $2, $5}')
-cpu_load=$(grep '^cpu\>' "/proc/stat" | awk '
-{
-    sum=0;
-    for (i=2; i<=NF; i++)
-        sum+=$i
-    printf "%.1f %%\n", (1 - $5/sum) * 100
-}')
 physical_cores=$(lscpu | awk -F ': *' '
 /Core\(s\) per socket/ {cores=$2}
 /Socket\(s\)/ {sockets=$2}
 END {printf "%d", sockets*cores}')
 
 cat << EOF
+
 #Architecture: $(uname --all)
 #CPU physical : $physical_cores
 #vCPU : $(lscpu | grep '^CPU(s)' | awk '{print $2}')
@@ -38,4 +51,5 @@ cat << EOF
 #User log: $(who -u | wc -l)
 #Network: IP $ip_addr ($mac_addr)
 #Sudo : $(find "/var/log/sudo" -mindepth 3 -maxdepth 3 -type d | wc -l) cmd
+
 EOF

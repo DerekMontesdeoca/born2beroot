@@ -3,8 +3,10 @@
 set -euo pipefail
 IFS=$'\n\t'
 
+script_dir=$(dirname "$0")
+
 set -a
-source "$(dirname "$0")/.env"
+source "$script_dir/.env"
 set +a
 
 # Firewall
@@ -107,6 +109,16 @@ Defaults requiretty
 EOF
 
 usermod --append --groups "dmontesd42" "sudo"
+
+# Set up monitoring.
+install --mode 755 --group "root" --user "root" \
+    "$script_dir/monitoring.sh" "/usr/local/bin"
+crontab -e - << EOF
+SHELL=/usr/bin/bash
+PATH=/usr/local/bin:/usr/bin/:/usr/sbin
+
+10 * * * * monitoring.sh | wall -n
+EOF
 
 # Remove script from .profile
 sed -i '/\/root\/born2beroot\/configure-server.bash/d' "/root/.profile"
