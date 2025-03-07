@@ -111,7 +111,7 @@ EOF
 usermod --append --groups "sudo" "dmontesd"
 
 # Set up monitoring.
-install --mode 755 --group "root" --user "root" \
+install --mode 755 --group "root" --owner "root" \
     "$script_dir/monitoring.sh" "/usr/local/bin"
 crontab -e - << EOF
 SHELL=/usr/bin/bash
