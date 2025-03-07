@@ -81,12 +81,34 @@ sed -i "/^PASS_WARN_AGE/s/.*/PASS_WARN_AGE\t7/" "/etc/login.defs"
 
 # Add non-root user
 if ! id dmontesd; then
-    adduser dmontesd --disabled-password
+    adduser "dmontesd" --disabled-password
     echo "dmontesd:${ENV_USER_PASSWORD}" | chpasswd
 fi
 
+if ! getent group "dmontesd42"; then
+    addgroup "dmontesd42"
+fi
+
+if ! id --groups --name "dmontesd" | tr ' ' $'\n' | grep -q '^dmontesd42$'; then
+    usermod --append --groups "dmontesd42" "dmontesd"
+fi
+
+# Set up sudo
+apt-get install --yes sudo
+
+EDITOR="cat" visudo --file "/etc/sudoers.d/custom" << EOF
+Defaults passwd_tries=3
+Defaults badpass_message="How many times do you need to type the password to learn it?"
+Defaults log_input
+Defaults log_output
+Defaults iolog_dir="/var/log/sudo"
+Defaults iolog_file="%Y%m%d_%{user}_%{command}_%{seq}"
+Defaults requiretty
+EOF
+
+usermod --append --groups "dmontesd42" "sudo"
+
 # Remove script from .profile
 sed -i '/\/root\/born2beroot\/configure-server.bash/d' "/root/.profile"
-apt-get install --yes shred
 shred -u "/root/born2beroot/.env"
 rm -rf "/root/born2beroot"

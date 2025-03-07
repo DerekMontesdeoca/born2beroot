@@ -29,7 +29,9 @@ fi
 
 # ============ Network Configuration ============ #
 
-echo -e "$ENV_HOSTNAME" > /etc/hostname
+echo "$ENV_HOSTNAME" > "/etc/hostname"
+
+echo -e "127.0.1.1\t$ENV_HOSTNAME"  >> "/etc/hosts"
 
 # lo interface
 if [[ ! -f "/etc/network/interfaces.d/lo" ]]; then
