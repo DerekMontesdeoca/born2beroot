@@ -113,7 +113,7 @@ usermod --append --groups "sudo" "dmontesd"
 # Set up monitoring.
 install --mode 755 --group "root" --owner "root" \
     "$script_dir/monitoring.sh" "/usr/local/bin"
-crontab -e - << EOF
+crontab - << EOF
 SHELL=/usr/bin/bash
 PATH=/usr/local/bin:/usr/bin/:/usr/sbin
 
