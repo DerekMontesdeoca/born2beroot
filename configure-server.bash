@@ -82,17 +82,17 @@ sed -i "/^PASS_MIN_DAYS/s/.*/PASS_MIN_DAYS\t2/" "/etc/login.defs"
 sed -i "/^PASS_WARN_AGE/s/.*/PASS_WARN_AGE\t7/" "/etc/login.defs"
 
 # Add non-root user
-if ! id dmontesd; then
-    adduser "dmontesd" --disabled-password
-    echo "dmontesd:${ENV_USER_PASSWORD}" | chpasswd
+if ! id $ENV_USERNAME; then
+    adduser --disabled-password --gecos "" "$ENV_USERNAME"
+    echo "$ENV_USERNAME:${ENV_USER_PASSWORD}" | chpasswd
 fi
 
-if ! getent group "dmontesd42"; then
-    addgroup "dmontesd42"
+if ! getent group "$ENV_HOSTNAME"; then
+    addgroup "$ENV_HOSTNAME"
 fi
 
-if ! id --groups --name "dmontesd" | tr ' ' $'\n' | grep -q '^dmontesd42$'; then
-    usermod --append --groups "dmontesd42" "dmontesd"
+if ! id --groups --name "$ENV_USERNAME" | tr ' ' $'\n' | grep -q "^${ENV_HOSTNAME}$"; then
+    usermod --append --groups "$ENV_HOSTNAME" "$ENV_USERNAME"
 fi
 
 # Set up sudo
@@ -108,7 +108,7 @@ Defaults iolog_file="%Y%m%d_%{user}_%{command}_%{seq}"
 Defaults requiretty
 EOF
 
-usermod --append --groups "sudo" "dmontesd"
+usermod --append --groups "sudo" "$ENV_USERNAME"
 
 # Set up monitoring.
 install --mode 755 --group "root" --owner "root" \
