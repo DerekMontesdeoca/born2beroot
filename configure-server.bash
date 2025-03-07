@@ -108,7 +108,7 @@ Defaults iolog_file="%Y%m%d_%{user}_%{command}_%{seq}"
 Defaults requiretty
 EOF
 
-usermod --append --groups "dmontesd42" "sudo"
+usermod --append --groups "sudo" "dmontesd"
 
 # Set up monitoring.
 install --mode 755 --group "root" --user "root" \
