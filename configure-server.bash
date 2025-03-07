@@ -98,7 +98,7 @@ fi
 # Set up sudo
 apt-get install --yes sudo
 
-EDITOR="cat" visudo --file "/etc/sudoers.d/custom" << EOF
+tee << EOF >(visudo -c "/dev/stdin" > /dev/null) | cat "/etc/sudoers.d/custom"
 Defaults passwd_tries=3
 Defaults badpass_message="How many times do you need to type the password to learn it?"
 Defaults log_input
