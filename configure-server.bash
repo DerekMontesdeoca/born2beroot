@@ -98,7 +98,9 @@ fi
 # Set up sudo
 apt-get install --yes sudo
 
-tee << EOF >(visudo -c "/dev/stdin" > /dev/null) | cat "/etc/sudoers.d/custom"
+mkdir -p "/var/log/sudo"
+
+tee << EOF >(visudo -c "/dev/stdin" > /dev/null) | cat > "/etc/sudoers.d/custom"
 Defaults passwd_tries=3
 Defaults badpass_message="How many times do you need to type the password to learn it?"
 Defaults log_input
@@ -117,8 +119,10 @@ crontab - << EOF
 SHELL=/usr/bin/bash
 PATH=/usr/local/bin:/usr/bin/:/usr/sbin
 
-10 * * * * monitoring.sh | wall -n
+0,10,20,30,40,50 * * * * monitoring.sh | wall -n
 EOF
+
+systemctl restart cron
 
 # Remove script from .profile
 sed -i '/\/root\/born2beroot\/configure-server.bash/d' "/root/.profile"

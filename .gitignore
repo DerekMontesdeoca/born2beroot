@@ -2,3 +2,5 @@
 *.vdi
 shared
 .env
+sha256sum
+signature

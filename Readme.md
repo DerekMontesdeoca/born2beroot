@@ -29,10 +29,10 @@ Build a server on a virtual machine. I'm using Debian stable. The idea is to try
 - [x] Mount 
 - [x] Set hostname to {login}42.
 - [x] Set up root passwd and admin user.
-- [ ] Set up the following users:
+- [x] Set up the following users:
     - root
     - {user}
-- [ ] Make sure that {user} user belongs to the groups user42 and sudo.
+- [x] Make sure that {user} user belongs to the groups user42 and sudo.
 - [x] Install ssh server.
 - [x] Configure ssh server. 
 - [x] Execute SSH on port 4242.
@@ -51,7 +51,7 @@ Build a server on a virtual machine. I'm using Debian stable. The idea is to try
         - No 3 consecutive chars
         - Username not allowed
         - Non-root only: At least 7 chars that don't belong to the old password.
-- [ ] Set up sudo and configure it:
+- [x] Set up sudo and configure it:
     - 3 Tries max.
     - Display custom message when inputting an incorrect password using sudo.
     - Log input and output of sudo commands on /var/log/sudo/.
@@ -64,9 +64,9 @@ Build a server on a virtual machine. I'm using Debian stable. The idea is to try
         - /sbin
         - /bin
         - /snap/bin
-- [ ] Learn how to create a user and assign it to a group for the defense.
-- [ ] After setting up configuration files, change all passwords on the VM, including root.
-- [ ] Create a monitoring script called monitoring.sh:
+- [x] Learn how to create a user and assign it to a group for the defense.
+- [x] After setting up configuration files, change all passwords on the VM, including root.
+- [x] Create a monitoring script called monitoring.sh:
     - Use /usr/bin/bash
     - Show info every 10 minutes (Check out wall). wall banner is optional.
       No errors must be present.
