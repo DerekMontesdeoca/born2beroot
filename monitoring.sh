@@ -21,17 +21,15 @@ BEGIN {
     }
     printf "%.1f %%\n", (1 - (idle - prev_idle) / (total - prev_total)) * 100
 }')
-default_interface=$(ip route | grep default | awk '{print $5}')
+default_interface=$(ip route | awk '/default/ {print $5}')
 ip_addr=$(ip -br addr show "$default_interface" \
     | awk '{split($3, ip, "/"); print ip[1]}')
 mac_addr=$(ip -br link show "$default_interface" | awk '{print $3}')
-tcp_conns=$(ss --tcp state established | wc -l | awk '{printf "%d", $1 - 1}')
+tcp_conns=$(ss --tcp state established | awk 'END {printf "%d", NR - 1}')
 mem_usage=$(free --mebi \
-    | grep 'Mem' \
-    | awk '{printf "%d/%dMB (%.2f %%)", $3, $2, $3/$2*100}')
+    | awk '/Mem/ {printf "%d/%dMB (%.2f %%)", $3, $2, $3/$2*100}')
 disk_usage=$(df --total --human-readable \
-    | tail -n1 \
-    | awk '{printf "%s/%s (%s)", $3, $2, $5}')
+    | awk 'NR > 1 {printf "%s/%s (%s)", $3, $2, $5}')
 physical_cores=$(lscpu | awk -F ': *' '
 /Core\(s\) per socket/ {cores=$2}
 /Socket\(s\)/ {sockets=$2}
@@ -41,7 +39,7 @@ cat << EOF
 
 #Architecture: $(uname --all)
 #CPU physical : $physical_cores
-#vCPU : $(lscpu | grep '^CPU(s)' | awk '{print $2}')
+#vCPU : $(lscpu | awk '/^CPU\(s\)/ {print $2}')
 #Memory Usage: $mem_usage
 #Disk Usage: $disk_usage
 #CPU load: $cpu_load
@@ -51,5 +49,4 @@ cat << EOF
 #User log: $(who -u | wc -l)
 #Network: IP $ip_addr ($mac_addr)
 #Sudo : $(find "/var/log/sudo" -mindepth 3 -maxdepth 3 -type d | wc -l) cmd
-
 EOF

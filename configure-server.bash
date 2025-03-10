@@ -117,12 +117,10 @@ install --mode 755 --group "root" --owner "root" \
     "$script_dir/monitoring.sh" "/usr/local/bin"
 crontab - << EOF
 SHELL=/usr/bin/bash
-PATH=/usr/local/bin:/usr/bin/:/usr/sbin
+PATH=/usr/local/bin:/usr/bin:/usr/sbin
 
-0,10,20,30,40,50 * * * * monitoring.sh | wall -n
+*/10 * * * * monitoring.sh | wall -n
 EOF
-
-systemctl restart cron
 
 # Remove script from .profile
 sed -i '/\/root\/born2beroot\/configure-server.bash/d' "/root/.profile"
