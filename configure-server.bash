@@ -121,9 +121,24 @@ PATH=/usr/local/bin:/usr/bin:/usr/sbin
 EOF
 
 # ============ Install Wordpress ============ #
-apt-get install --yes unzip curl php lighttpd mariadb-server pwgen
+ 
+apt-get install --yes unzip curl php lighttpd mariadb-server pwgen \
+    php php-mysql php-cgi
 
-if [[ -d "wordpress" ]]; then
+systemctl disable --now apache2
+systemctl stop lighttpd
+
+if ! command -v wp; then
+    curl -O "https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar"
+    chmod +100 "wp-cli.phar"
+    mv "wp-cli.phar" "/usr/local/bin/wp"
+fi
+
+lighty-enable-mod fastcgi || true
+lighty-enable-mod fastcgi-php || true
+lighty-enable-mod accesslog || true
+
+if [[ ! -d "wordpress" ]]; then
     curl --fail --location --remote-name "https://wordpress.org/latest.zip"
     trap "rm -f ~/latest.zip" EXIT
     unzip "latest.zip"
@@ -131,18 +146,51 @@ fi
 
 envsubst < "$script_dir/create-db.sql" | mysql
 
-awk << EOF "wordpress/wp-config-sample.php" > "wordpress/wp-config.php"
-/DB_NAME/ {$3 = "'$ENV_WORDPRESS_DATABASE'"}
-/DB_USER/ {$3 = "'$ENV_WORDPRESS_USER'"}
-/DB_PASSWORD/ {$3 = "'$ENV_DATABASE_PASSWORD"}
+awk '
+/DB_NAME/ {$3 = "'\'"$ENV_WORDPRESS_DATABASE"\''"}
+/DB_USER/ {$3 = "'\'"$ENV_WORDPRESS_USER"\''"}
+/DB_PASSWORD/ {$3 = "'\'"$ENV_DATABASE_PASSWORD"\''"}
 /put your unique phrase here/ {
-    pwgen -s 64 1 | readline phrase
+    "pwgen -s 64 1" | getline phrase
     gsub("put your unique phrase here", phrase)
+    close ("pwgen -s 64 1")
 }
-{print}
-EOF
+{print}' "wordpress/wp-config-sample.php" > "wordpress/wp-config.php"
+
+rsync -azv "wordpress/" "/var/www/http"
+chmod -R 755 "/var/www/http"
+chown -R "www-data:www-data" "/var/www/http" 
+
+lighttpd -f "/etc/lighttpd/lighttpd.conf"
+
+ufw allow in from any to any port 80
 
 # ============ #
+
+# Fail2ban: protection against brute force attacks.
+apt-get install --yes fail2ban 
+cat << EOF > "/etc/fail2ban/jail.d/jail.custom"
+[DEFAULT]
+backend = auto
+bantime = 10m
+maxretry = 5
+findtime = 30m
+logtarget = SYSTEMD-JOURNAL
+
+[sshd]
+enabled = true
+backend = systemd
+
+[lighttpd]
+backend = polling
+enabled = true
+port = http,https
+logpath = /var/log/lighttpd/access.log
+action = ufw
+filter = lighttpd_auth
+EOF
+
+systemctl enable --now fail2ban
 
 # Remove script from .profile
 sed -i '/\/root\/born2beroot\/configure-server.bash/d' "/root/.profile"
