@@ -121,12 +121,26 @@ PATH=/usr/local/bin:/usr/bin:/usr/sbin
 EOF
 
 # ============ Install Wordpress ============ #
-apt-get install --yes unzip curl php lighttpd mariadb-server
+apt-get install --yes unzip curl php lighttpd mariadb-server pwgen
 
-curl --fail --location --remote-name "https://wordpress.org/latest.zip"
-trap "rm -f ~/latest.zip" EXIT
+if [[ -d "wordpress" ]]; then
+    curl --fail --location --remote-name "https://wordpress.org/latest.zip"
+    trap "rm -f ~/latest.zip" EXIT
+    unzip "latest.zip"
+fi
 
-unzip "latest.zip"
+envsubst < "$script_dir/create-db.sql" | mysql
+
+awk << EOF "wordpress/wp-config-sample.php" > "wordpress/wp-config.php"
+/DB_NAME/ {$3 = "'$ENV_WORDPRESS_DATABASE'"}
+/DB_USER/ {$3 = "'$ENV_WORDPRESS_USER'"}
+/DB_PASSWORD/ {$3 = "'$ENV_DATABASE_PASSWORD"}
+/put your unique phrase here/ {
+    pwgen -s 64 1 | readline phrase
+    gsub("put your unique phrase here", phrase)
+}
+{print}
+EOF
 
 # ============ #
 
