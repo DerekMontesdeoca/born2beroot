@@ -29,7 +29,7 @@ tcp_conns=$(ss --tcp state established | awk 'END {printf "%d", NR - 1}')
 mem_usage=$(free --mebi \
     | awk '/Mem/ {printf "%d/%dMB (%.2f %%)", $3, $2, $3/$2*100}')
 disk_usage=$(df --total --human-readable \
-    | awk 'NR > 1 {printf "%s/%s (%s)", $3, $2, $5}')
+    | awk 'END {printf "%s/%s (%s)", $3, $2, $5}')
 physical_cores=$(lscpu | awk -F ': *' '
 /Core\(s\) per socket/ {cores=$2}
 /Socket\(s\)/ {sockets=$2}
@@ -46,7 +46,7 @@ cat << EOF
 #Last boot: $(uptime -s)
 #LVM use: $(if lvscan | grep -q 'ACTIVE'; then echo 'yes'; else echo 'no'; fi)
 #TCP Connections : $tcp_conns ESTABLISHED
-#User log: $(who -u | wc -l)
+#User log: $(who -u | awk '{users[$1] = 1} END {print length(users)}')
 #Network: IP $ip_addr ($mac_addr)
 #Sudo : $(find "/var/log/sudo" -mindepth 3 -maxdepth 3 -type d | wc -l) cmd
 EOF

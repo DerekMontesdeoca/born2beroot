@@ -5,13 +5,11 @@ IFS=$'\n\t'
 
 script_dir=$(dirname "$0")
 
-set -a
 source "$script_dir/.env"
-set +a
 
 # Firewall
 apt-get install ufw -y
-if ufw status | grep -q 'Status: active' \
+if ! ufw status | grep -q 'Status: active' \
     && ufw status numbered | grep -q -P '\[ 1] 4242/tcp.*ALLOW' \
     && ufw status numbered | grep -q -P '\[ 2] 4242/tcp.*ALLOW';
 then
@@ -121,6 +119,16 @@ PATH=/usr/local/bin:/usr/bin:/usr/sbin
 
 */10 * * * * monitoring.sh | wall -n
 EOF
+
+# ============ Install Wordpress ============ #
+apt-get install --yes unzip curl php lighttpd mariadb-server
+
+curl --fail --location --remote-name "https://wordpress.org/latest.zip"
+trap "rm -f ~/latest.zip" EXIT
+
+unzip "latest.zip"
+
+# ============ #
 
 # Remove script from .profile
 sed -i '/\/root\/born2beroot\/configure-server.bash/d' "/root/.profile"

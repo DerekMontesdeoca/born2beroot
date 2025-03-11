@@ -15,12 +15,15 @@ apt-get update
 apt-get upgrade -y
 
 # Set up locale.
-apt-get install --no-install-recommends locales -y
+DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends locales -y
 if [[ ! -f "/etc/locale.gen" ]] || ! grep '^[^#]' "/etc/locale.gen"; then
     sed -i '/en_US.UTF-8/ s/# //' /etc/locale.gen
     locale-gen
     echo -e "\nexport LANG=en_US.UTF-8" > /etc/profile
 fi
+
+DEBIAN_FRONTEND=noninteractive apt-get install --yes console-setup
+
 
 # Set root password.
 if [[ $(passwd --status root | awk '{print $2}') != 'P' ]]; then
