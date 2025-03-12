@@ -149,7 +149,7 @@ env $(cat "$script_dir/.env") envsubst < "$script_dir/create-db.sql" | mysql
 awk '
 /DB_NAME/ {$3 = "'\'"$ENV_WORDPRESS_DATABASE"\''"}
 /DB_USER/ {$3 = "'\'"$ENV_WORDPRESS_DATABASE_USER"\''"}
-/DB_PASSWORD/ {$3 = "'\'"$ENV_WORDPRESS_DATABASE_PASSWORD"\''"}
+/DB_PASSWORD/ {$3 = "'\'"$ENV_WORDPRESS_DATABASE_USER_PASSWORD"\''"}
 /put your unique phrase here/ {
     "pwgen -s 64 1" | getline phrase
     gsub("put your unique phrase here", phrase)
