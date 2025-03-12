@@ -130,7 +130,7 @@ systemctl stop lighttpd
 
 if ! command -v wp; then
     curl -O "https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar"
-    chmod +100 "wp-cli.phar"
+    chmod 755 "wp-cli.phar"
     mv "wp-cli.phar" "/usr/local/bin/wp"
 fi
 
@@ -148,8 +148,8 @@ env $(cat "$script_dir/.env") envsubst < "$script_dir/create-db.sql" | mysql
 
 awk '
 /DB_NAME/ {$3 = "'\'"$ENV_WORDPRESS_DATABASE"\''"}
-/DB_USER/ {$3 = "'\'"$ENV_WORDPRESS_USER"\''"}
-/DB_PASSWORD/ {$3 = "'\'"$ENV_DATABASE_PASSWORD"\''"}
+/DB_USER/ {$3 = "'\'"$ENV_WORDPRESS_DATABASE_USER"\''"}
+/DB_PASSWORD/ {$3 = "'\'"$ENV_WORDPRESS_DATABASE_PASSWORD"\''"}
 /put your unique phrase here/ {
     "pwgen -s 64 1" | getline phrase
     gsub("put your unique phrase here", phrase)
@@ -157,13 +157,26 @@ awk '
 }
 {print}' "wordpress/wp-config-sample.php" > "wordpress/wp-config.php"
 
-rsync -azv "wordpress/" "/var/www/http"
-chmod -R 755 "/var/www/http"
-chown -R "www-data:www-data" "/var/www/http" 
+rsync -azv "wordpress/" "/var/www/html"
+chmod -R 755 "/var/www/html"
+chown -R "www-data:www-data" "/var/www/html" 
 
 lighttpd -f "/etc/lighttpd/lighttpd.conf"
 
 ufw allow in from any to any port 80
+
+default_interface=$(ip route | awk '/default/ {print $5}')
+ip_addr=$(ip -br addr show "$default_interface" \
+    | awk '{split($3, ip, "/"); print ip[1]}')
+
+su "www-data" --shell "/bin/bash" -c \
+    "\
+wp core install \
+    --url=\"$ip_addr\" \
+    --title=\"$ENV_WORDPRESS_TITLE\" \
+    --admin_user=\"$ENV_WORDPRESS_ADMIN_USER\" \
+    --admin_email=\"$ENV_WORDPRESS_ADMIN_EMAIL\" \
+    --admin_password=\"$ENV_WORDPRESS_ADMIN_PASSWORD\""
 
 # ============ #
 
