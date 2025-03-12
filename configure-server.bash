@@ -161,7 +161,7 @@ rsync -azv "wordpress/" "/var/www/html"
 chmod -R 755 "/var/www/html"
 chown -R "www-data:www-data" "/var/www/html" 
 
-systemctl enable --now ligttpd
+systemctl enable --now lighttpd
 
 ufw allow in from any to any port 80
 
@@ -204,7 +204,8 @@ action = ufw
 filter = lighttpd_auth
 EOF
 
-systemctl enable --now fail2ban
+systemctl enable fail2ban
+systemctl restart fail2ban
 
 # Remove script from .profile
 sed -i '/\/root\/born2beroot\/configure-server.bash/d' "/root/.profile"
