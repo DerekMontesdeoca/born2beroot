@@ -144,7 +144,7 @@ if [[ ! -d "wordpress" ]]; then
     unzip "latest.zip"
 fi
 
-envsubst < "$script_dir/create-db.sql" | mysql
+env $(cat .env) envsubst < "$script_dir/create-db.sql" | mysql
 
 awk '
 /DB_NAME/ {$3 = "'\'"$ENV_WORDPRESS_DATABASE"\''"}
