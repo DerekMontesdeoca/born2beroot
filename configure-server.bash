@@ -9,9 +9,9 @@ source "$script_dir/.env"
 
 # Firewall
 apt-get install ufw -y
-if ! ufw status | grep -q 'Status: active' \
+if ! (ufw status | grep -q 'Status: active' \
     && ufw status numbered | grep -q -P '\[ 1] 4242/tcp.*ALLOW' \
-    && ufw status numbered | grep -q -P '\[ 2] 4242/tcp.*ALLOW';
+    && ufw status numbered | grep -q -P '\[ 2] 4242/tcp.*ALLOW');
 then
     ufw --force reset
     ufw logging on
@@ -161,7 +161,7 @@ rsync -azv "wordpress/" "/var/www/html"
 chmod -R 755 "/var/www/html"
 chown -R "www-data:www-data" "/var/www/html" 
 
-lighttpd -f "/etc/lighttpd/lighttpd.conf"
+systemctl enable --now ligttpd
 
 ufw allow in from any to any port 80
 
@@ -172,6 +172,7 @@ ip_addr=$(ip -br addr show "$default_interface" \
 su "www-data" --shell "/bin/bash" -c \
     "\
 wp core install \
+    --path=\"/var/www/html\" \
     --url=\"$ip_addr\" \
     --title=\"$ENV_WORDPRESS_TITLE\" \
     --admin_user=\"$ENV_WORDPRESS_ADMIN_USER\" \
