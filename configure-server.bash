@@ -114,6 +114,7 @@ Defaults iolog_file="%Y%m%d_%{user}_%{command}_%{seq}"
 Defaults requiretty
 EOF
 
+usermod --append --groups "sudo" "root"
 usermod --append --groups "sudo" "$ENV_USERNAME"
 
 # Set up monitoring.
