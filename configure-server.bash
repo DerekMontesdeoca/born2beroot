@@ -79,18 +79,24 @@ sed -i "/^PASS_MAX_DAYS/s/.*/PASS_MAX_DAYS\t30/" "/etc/login.defs"
 sed -i "/^PASS_MIN_DAYS/s/.*/PASS_MIN_DAYS\t2/" "/etc/login.defs"
 sed -i "/^PASS_WARN_AGE/s/.*/PASS_WARN_AGE\t7/" "/etc/login.defs"
 
+# Change expiry of root because /etc/login.defs only affects new accounts.
+chage --mindays 2 --maxdays 30 --warndays 7 root
+
 # Add non-root user
 if ! id $ENV_USERNAME; then
     adduser --disabled-password --gecos "" "$ENV_USERNAME"
     echo "$ENV_USERNAME:${ENV_USER_PASSWORD}" | chpasswd
 fi
 
-if ! getent group "$ENV_HOSTNAME"; then
-    addgroup "$ENV_HOSTNAME"
+if ! getent group "user42"; then
+    addgroup "user42"
 fi
 
-if ! id --groups --name "$ENV_USERNAME" | tr ' ' $'\n' | grep -q "^${ENV_HOSTNAME}$"; then
-    usermod --append --groups "$ENV_HOSTNAME" "$ENV_USERNAME"
+if ! id --groups --name "$ENV_USERNAME" \
+    | tr ' ' $'\n' \
+    | grep --quiet --line-regexp "user42"
+then
+    usermod --append --groups "user42" "$ENV_USERNAME"
 fi
 
 # Set up sudo
