@@ -15,8 +15,8 @@ if [[ "$EUID" -ne 0 ]]; then
 fi
 
 # Update and install required packages for debian isntallation.
-apt update && apt upgrade -y
-apt install debootstrap dosfstools parted lvm2 cryptsetup systemd-timesyncd -y
+apt-get update && apt-get upgrade -y
+apt-get install debootstrap dosfstools parted lvm2 cryptsetup systemd-timesyncd -y
 
 # Sync Time.
 if ! systemctl status systemd-timesyncd --no-pager; then
