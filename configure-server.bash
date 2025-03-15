@@ -72,6 +72,7 @@ ucredit = -1
 maxrepeat = 3
 usercheck = 1
 enforce_for_root
+enforcing = 1
 EOF
 
 # Password expiry.
