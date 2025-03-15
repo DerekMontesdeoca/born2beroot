@@ -42,11 +42,30 @@ awk -F':' '
         exit 1
 }' "/etc/shadow"
 
-awk '
-/^PASS_MAX_DAYS/ {if ($2 != 30) exit 1}
-/^PASS_MIN_DAYS/ {if ($2 != 2) exit 1}
-/^PASS_WARN_DAYS/ {if ($2 != 7) exit 1}
-' "/etc/login.defs"
+declare -A rules
+rules=(PASS_MAX_DAYS 30 PASS_MIN_DAYS 2 PASS_WARN_AGE 7)
+for rule in "${!rules[@]}"; do
+    grep "^$rule" "/etc/login.defs" | awk '{if ($2 != '"${rules[$rule]}"') exit 1}' 
+done
 
 # pwquality
+rules=(
+    minlen 10 ucredit -1 dcredit -1 lcredit -1 maxrepeat 3 usercheck 1 
+    enforcing 1 difok 7 enforce_for_root
+)
+for rule in "${!rules[@]}"; do
+    grep "^$rule" "/etc/security/pwquality.conf" \
+        | awk -v rule="${rules[$rule]}" '{if ($3 != rule) exit 1}' 
+done
+
+# Sudoers
+sudoers_files=("/etc/sudoers" $(find "/etc/sudoers.d" -type f))
+rules=(
+    passwd_tries 3 badpass_message "" log_input "" log_output ""
+    iolog_dir "\"/var/log/sudo\"" requiretty "" secure_path ""
+)
+for rule in "${!rules[@]}"; do
+    grep --no-filename "^Defaults[[:space:]]*$rule" "${sudoers_files[@]}" \
+        | awk -F'=' -v value="${rules[$rule]}" '{if (value != "" && $2 != value) exit 1}'
+done
 
