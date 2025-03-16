@@ -69,3 +69,7 @@ for rule in "${!rules[@]}"; do
         | awk -F'=' -v value="${rules[$rule]}" '{if (value != "" && $2 != value) exit 1}'
 done
 
+# Crontab
+systemctl status cron
+crontab -l | grep "\*/10 \* \* \* \*.*monitoring.sh"  
+crontab -l | grep "\*/10 \* \* \* \*.*wall"  
