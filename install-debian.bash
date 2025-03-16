@@ -43,7 +43,7 @@ fi
 cryptmapping_name="sda5_crypt"
 cryptmapping="/dev/mapper/$cryptmapping_name"
 cryptpart="/dev/sda5"
-if ! cryptsetup isLuks /dev/sda5; then
+if ! cryptsetup isLuks "$cryptpart"; then
     echo "$ENV_LUKS_PASSWORD" | cryptsetup --batch-mode luksFormat "$cryptpart"
 fi
 if [[ ! -e "/dev/mapper/sda5_crypt" ]]; then
